@@ -41,7 +41,7 @@ User Context:
 - DSA Progress: ${dsa ? dsa.problemsSolved + " problems solved" : "Unknown"}
 - Roadmap: ${roadmap ? "Generated" : "Not generated"}`;
 
-    const conversationContext = body.history.map(msg => `${msg.role === 'user' ? 'User' : 'Onyx OS'}: ${msg.content}`).join("\n");
+    const conversationContext = (body.history || []).map(msg => `${msg.role === 'user' ? 'User' : 'Onyx OS'}: ${msg.content}`).join("\n");
     const fullUserPrompt = `${conversationContext}\n\nUser: ${body.message}\n\nPlease respond to the user's latest message based on the context provided.`;
 
     const prompt = buildPrompt(systemPrompt, fullUserPrompt, aiSchema);
