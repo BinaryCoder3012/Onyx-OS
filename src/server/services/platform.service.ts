@@ -13,11 +13,14 @@ export async function getPlatformProfile(userId: string) {
     id: profile.id,
     leetcodeHandle: profile.leetcodeHandle,
     codeforcesHandle: profile.codeforcesHandle,
+    codechefHandle: profile.codechefHandle,
+    atcoderHandle: profile.atcoderHandle,
     githubUsername: profile.githubUsername,
     linkedinUrl: profile.linkedinUrl,
     ratings: parseJson<PlatformRatings>(profile.ratings, {
       leetcode: null,
       codeforces: null,
+      codechef: null,
       atcoder: null,
     }),
   };
@@ -28,6 +31,8 @@ export async function updatePlatformProfile(
   data: Partial<{
     leetcodeHandle: string | null;
     codeforcesHandle: string | null;
+    codechefHandle: string | null;
+    atcoderHandle: string | null;
     githubUsername: string | null;
     linkedinUrl: string | null;
     ratings: PlatformRatings;
@@ -43,6 +48,8 @@ export async function updatePlatformProfile(
     update: {
       ...(data.leetcodeHandle !== undefined && { leetcodeHandle: data.leetcodeHandle }),
       ...(data.codeforcesHandle !== undefined && { codeforcesHandle: data.codeforcesHandle }),
+      ...(data.codechefHandle !== undefined && { codechefHandle: data.codechefHandle }),
+      ...(data.atcoderHandle !== undefined && { atcoderHandle: data.atcoderHandle }),
       ...(data.githubUsername !== undefined && { githubUsername: data.githubUsername }),
       ...(data.linkedinUrl !== undefined && { linkedinUrl: data.linkedinUrl }),
       ratings,
@@ -51,6 +58,8 @@ export async function updatePlatformProfile(
       userId,
       leetcodeHandle: data.leetcodeHandle ?? null,
       codeforcesHandle: data.codeforcesHandle ?? null,
+      codechefHandle: data.codechefHandle ?? null,
+      atcoderHandle: data.atcoderHandle ?? null,
       githubUsername: data.githubUsername ?? null,
       linkedinUrl: data.linkedinUrl ?? null,
       ratings,
