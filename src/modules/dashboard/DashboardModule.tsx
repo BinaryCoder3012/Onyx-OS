@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ModuleHeader } from "@/components/shared/ModuleHeader";
 import { BarChart, LoadingState, Panel, StatCard } from "@/components/ui";
 import { MODULE_LABELS } from "@/constants/navigation";
@@ -26,10 +27,21 @@ interface DashboardStats {
   }>;
 }
 
+interface Suggestion {
+  suggestion: string;
+  actionUrl: string;
+  actionLabel: string;
+}
+
 export function DashboardModule() {
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => apiFetch<DashboardStats>("/api/dashboard"),
+  });
+
+  const { data: suggestion, isLoading: isLoadingSuggestion } = useQuery({
+    queryKey: ["suggestion"],
+    queryFn: () => apiFetch<Suggestion>("/api/dashboard/suggestion"),
   });
 
   if (isLoading || !data) return <LoadingState label="Loading dashboard" />;
@@ -42,6 +54,24 @@ export function DashboardModule() {
   return (
     <div className="flex h-full flex-col gap-4">
       <ModuleHeader title="Dashboard" subtitle="System overview — operator session" />
+
+      {suggestion && (
+        <div className="rounded-lg border border-neon-cyan/20 bg-neon-cyan/5 p-4 onyx-active-glow animate-slide-up">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">✨</span>
+            <div className="flex-1">
+              <h3 className="font-mono text-xs font-bold text-neon-cyan">Daily AI Directive</h3>
+              <p className="mt-1 font-sans text-sm text-onyx-fg">{suggestion.suggestion}</p>
+            </div>
+            <Link 
+              href={suggestion.actionUrl} 
+              className="rounded bg-neon-cyan px-3 py-1.5 font-mono text-2xs font-bold text-carbon transition-opacity hover:opacity-80"
+            >
+              {suggestion.actionLabel}
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-px bg-graphite-border lg:grid-cols-4">
         <StatCard label="Solved" value={data.problemsSolved} variant="neon" />
