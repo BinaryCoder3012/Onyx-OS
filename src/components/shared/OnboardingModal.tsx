@@ -11,8 +11,10 @@ interface ProfilePayload {
   profile: {
     leetcodeHandle: string | null;
     codeforcesHandle: string | null;
+    codechefHandle: string | null;
+    atcoderHandle: string | null;
     githubUsername: string | null;
-    ratings: { leetcode: number | null; codeforces: number | null; atcoder: number | null };
+    ratings: { leetcode: number | null; codeforces: number | null; codechef: number | null; atcoder: number | null };
   } | null;
 }
 
@@ -35,6 +37,8 @@ export function OnboardingModal() {
   const [step, setStep] = useState<Step>("platform");
   const [lc, setLc] = useState("");
   const [cf, setCf] = useState("");
+  const [cc, setCc] = useState("");
+  const [ac, setAc] = useState("");
   const [gh, setGh] = useState("");
   const [targetRole, setTargetRole] = useState(CAREER_OPTIONS[0]);
   const [resumeText, setResumeText] = useState("");
@@ -71,18 +75,20 @@ export function OnboardingModal() {
   // Don't show if loading, dismissed, or already configured
   if (isLoading || dismissed) return null;
   const p = data?.profile;
-  const isConfigured = p?.leetcodeHandle || p?.codeforcesHandle;
+  const isConfigured = p?.leetcodeHandle || p?.codeforcesHandle || p?.codechefHandle || p?.atcoderHandle;
   if (isConfigured) return null;
 
   const handleSaveHandles = async () => {
-    if (!lc && !cf && !gh) { setStep("resume"); return; }
+    if (!lc && !cf && !cc && !ac && !gh) { setStep("resume"); return; }
     await saveMutation.mutateAsync({
       leetcodeHandle: lc || null,
       codeforcesHandle: cf || null,
+      codechefHandle: cc || null,
+      atcoderHandle: ac || null,
       githubUsername: gh || null,
     });
     // Auto-sync ratings after saving handles
-    if (lc || cf) await syncMutation.mutateAsync();
+    if (lc || cf || cc || ac) await syncMutation.mutateAsync();
     setStep("resume");
   };
 
@@ -131,7 +137,7 @@ export function OnboardingModal() {
               <p className="font-mono text-2xs text-onyx-muted">
                 Enter your competitive programming handles. Ratings will be fetched automatically from public APIs. You can skip and fill these later in <strong className="text-onyx-fg">CP Matrix</strong>.
               </p>
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="font-mono text-2xs text-onyx-subtle">LeetCode Username</label>
                   <Input
@@ -150,6 +156,22 @@ export function OnboardingModal() {
                   />
                 </div>
                 <div className="space-y-1">
+                  <label className="font-mono text-2xs text-onyx-subtle">CodeChef Handle</label>
+                  <Input
+                    placeholder="e.g. cc_handle"
+                    value={cc}
+                    onChange={(e) => setCc(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-mono text-2xs text-onyx-subtle">AtCoder Handle</label>
+                  <Input
+                    placeholder="e.g. ac_handle"
+                    value={ac}
+                    onChange={(e) => setAc(e.target.value)}
+                  />
+                </div>
+                <div className="col-span-2 space-y-1">
                   <label className="font-mono text-2xs text-onyx-subtle">GitHub Username</label>
                   <Input
                     placeholder="e.g. github_user"
