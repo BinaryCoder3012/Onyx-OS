@@ -17,7 +17,7 @@ interface DashboardStats {
   activeGoals: number;
   opportunities: number;
   resumeScore: number;
-  ratings: { leetcode: number | null; codeforces: number | null; atcoder: number | null };
+  ratings: { leetcode: number | null; codeforces: number | null; codechef: number | null; atcoder: number | null };
   recentSessions: Array<{
     id: string;
     moduleId: string;
@@ -97,6 +97,14 @@ export function DashboardModule() {
             <div className="flex justify-between">
               <span className="text-onyx-muted">Codeforces</span>
               <span className="text-neon-cyan onyx-tabular">{data.ratings.codeforces ?? "—"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-onyx-muted">CodeChef</span>
+              <span className="text-neon-cyan onyx-tabular">{data.ratings.codechef ?? "—"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-onyx-muted">AtCoder</span>
+              <span className="text-neon-cyan onyx-tabular">{data.ratings.atcoder ?? "—"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-onyx-muted">Goals</span>
