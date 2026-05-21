@@ -103,6 +103,44 @@ export async function syncPlatformRatings(userId: string) {
     }
   }
 
+  // 3. Fetch CodeChef
+  if (existing.codechefHandle) {
+    try {
+      const res = await fetch(`https://www.codechef.com/users/${existing.codechefHandle}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
+        next: { revalidate: 3600 }
+      });
+      const text = await res.text();
+      const match = text.match(/class=["']rating-number["']>(\d+)</);
+      if (match && match[1]) {
+        currentRatings.codechef = parseInt(match[1], 10);
+      }
+    } catch (e) {
+      console.error("[CodeChef Sync Error]", e);
+    }
+  }
+
+  // 4. Fetch AtCoder
+  if (existing.atcoderHandle) {
+    try {
+      const res = await fetch(`https://atcoder.jp/users/${existing.atcoderHandle}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
+        next: { revalidate: 3600 }
+      });
+      const text = await res.text();
+      const match = text.match(/Rating<\/th>\s*<td><span[^>]*class=["']user-[^"']*["']>(\d+)<\/span>/i);
+      if (match && match[1]) {
+        currentRatings.atcoder = parseInt(match[1], 10);
+      }
+    } catch (e) {
+      console.error("[AtCoder Sync Error]", e);
+    }
+  }
+
   // Save the synced ratings
   await updatePlatformProfile(userId, { ratings: currentRatings });
   
