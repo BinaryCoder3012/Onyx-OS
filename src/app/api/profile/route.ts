@@ -7,14 +7,17 @@ import { getUserContext, updatePreferences } from "@/server/services/auth.servic
 import { z } from "zod";
 
 const updateSchema = z.object({
-  leetcodeHandle: z.string().optional(),
-  codeforcesHandle: z.string().optional(),
-  githubUsername: z.string().optional(),
-  linkedinUrl: z.string().optional(),
+  leetcodeHandle: z.string().optional().nullable(),
+  codeforcesHandle: z.string().optional().nullable(),
+  codechefHandle: z.string().optional().nullable(),
+  atcoderHandle: z.string().optional().nullable(),
+  githubUsername: z.string().optional().nullable(),
+  linkedinUrl: z.string().optional().nullable(),
   ratings: z
     .object({
       leetcode: z.number().nullable(),
       codeforces: z.number().nullable(),
+      codechef: z.number().nullable(),
       atcoder: z.number().nullable(),
     })
     .optional(),
