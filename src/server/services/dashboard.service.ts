@@ -21,7 +21,7 @@ export async function getDashboardStats(userId: string) {
 
   const ratings = parseJson<PlatformRatings>(
     profile?.ratings ?? "{}",
-    { leetcode: null, codeforces: null, atcoder: null }
+    { leetcode: null, codeforces: null, codechef: null, atcoder: null }
   );
 
   const totalMinutes = sessions.reduce((s, x) => s + x.durationMinutes, 0);
