@@ -20,7 +20,6 @@ export const POST = createApiHandler({
 
     let leetcodeSolved = 0;
     let codeforcesRating = null;
-    let codechefRating = null;
 
     // Fetch LeetCode stats
     if (platformProfile.leetcodeHandle) {
