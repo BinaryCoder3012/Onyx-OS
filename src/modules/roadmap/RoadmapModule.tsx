@@ -1,7 +1,7 @@
 "use client";
 
 import { ModuleHeader } from "@/components/shared/ModuleHeader";
-import { Badge, LoadingState, Panel } from "@/components/ui";
+import { Badge, Button, EmptyState, LoadingState, Panel } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/cn";
 import type { RoadmapNode } from "@/types";
@@ -66,20 +66,58 @@ export function RoadmapModule() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["roadmap"] }),
   });
 
+  const generateMutation = useMutation({
+    mutationFn: () => {
+      const targetRole = localStorage.getItem("onyx_target_role") || "Software Engineer";
+      return apiFetch<RoadmapNode[]>("/api/roadmap/generate", {
+        method: "POST",
+        body: JSON.stringify({ targetRole }),
+      });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["roadmap"] }),
+  });
+
   if (isLoading || !data) return <LoadingState label="Loading roadmap" />;
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <ModuleHeader title="Roadmap Engine" subtitle="Learning path progression" />
+      <div className="flex justify-between items-center">
+        <ModuleHeader title="Roadmap Engine" subtitle="Learning path progression" />
+        <Button 
+          variant="cyber" 
+          onClick={() => generateMutation.mutate()} 
+          disabled={generateMutation.isPending}
+        >
+          {generateMutation.isPending ? "Generating..." : "Regenerate AI Plan"}
+        </Button>
+      </div>
+      
       <Panel title="Path" className="flex-1 overflow-auto p-2">
-        {data.map((node) => (
-          <NodeRow
-            key={node.id}
-            node={node}
-            depth={0}
-            onStatus={(id, status) => patchMutation.mutate({ nodeId: id, status })}
-          />
-        ))}
+        {data.length === 0 ? (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <EmptyState 
+              icon="⎈" 
+              message="No Roadmap Found" 
+              hint="Generate an AI roadmap based on your resume and goals." 
+            />
+            <Button 
+              variant="accent" 
+              onClick={() => generateMutation.mutate()} 
+              disabled={generateMutation.isPending}
+            >
+              {generateMutation.isPending ? "Generating AI Plan..." : "Generate Initial Plan"}
+            </Button>
+          </div>
+        ) : (
+          data.map((node) => (
+            <NodeRow
+              key={node.id}
+              node={node}
+              depth={0}
+              onStatus={(id, status) => patchMutation.mutate({ nodeId: id, status })}
+            />
+          ))
+        )}
       </Panel>
     </div>
   );
