@@ -94,6 +94,8 @@ model PlatformProfile {
   userId           String   @unique
   leetcodeHandle   String?
   codeforcesHandle String?
+  codechefHandle   String?
+  atcoderHandle    String?
   githubUsername   String?
   linkedinUrl      String?
   ratings          String   @default("{}")
