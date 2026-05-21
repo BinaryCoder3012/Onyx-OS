@@ -40,6 +40,11 @@ export function DSAVaultModule() {
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["dsa"] });
 
+  const syncMutation = useMutation({
+    mutationFn: () => apiFetch("/api/dsa/sync", { method: "POST" }),
+    onSuccess: refresh,
+  });
+
   const addMutation = useMutation({
     mutationFn: () =>
       apiFetch<DSAPayload>("/api/dsa", {
@@ -66,12 +71,21 @@ export function DSAVaultModule() {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <ModuleHeader title="DSA Vault" subtitle="Problem tracking & topic mastery" />
+      <div className="flex items-center justify-between">
+        <ModuleHeader title="DSA Vault" subtitle="Problem tracking & topic mastery" />
+        <Button 
+          variant="cyber" 
+          onClick={() => syncMutation.mutate()} 
+          disabled={syncMutation.isPending}
+        >
+          {syncMutation.isPending ? "Syncing..." : "Sync Cloud Stats"}
+        </Button>
+      </div>
 
       <div className="grid grid-cols-3 gap-px bg-graphite-border">
-        <StatCard label="Solved" value={data.vault?.problemsSolved ?? 0} variant="neon" />
+        <StatCard label="Solved (Local+Cloud)" value={data.vault?.problemsSolved ?? 0} variant="neon" />
         <StatCard label="Streak" value={data.vault?.streakDays ?? 0} suffix="d" variant="cyber" />
-        <StatCard label="Total" value={data.problems.length} />
+        <StatCard label="Local Tracked" value={data.problems.length} />
       </div>
 
       <Panel title="Add Problem" className="p-3">
