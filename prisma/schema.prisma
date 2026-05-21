@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  displayName String
+  avatarUrl   String?
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  onyxContext     OnyxContext?
+  dsaVault        DSAVault?
+  platformProfile PlatformProfile?
+  studySessions   StudySession[]
+  dsaProblems     DSAProblem[]
+  careerGoals     CareerGoal[]
+  resumeProfile   ResumeProfile?
+  opportunities   OpportunityItem[]
+  roadmap         RoadmapProgress?
+
+  @@index([email])
+  @@index([isDeleted])
+  @@map("users")
+}
+
+model OnyxContext {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  activeModule       String   @default("dashboard")
+  preferences        String   @default("{}")
+  onboardingComplete Boolean  @default(false)
+  isDeleted          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDeleted])
+  @@map("onyx_contexts")
+}
+
+model DSAVault {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  problemsSolved  Int       @default(0)
+  topicsMastered  String    @default("[]")
+  streakDays      Int       @default(0)
+  lastActivityAt  DateTime?
+  metadata        String    @default("{}")
+  isDeleted       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDeleted])
+  @@map("dsa_vaults")
+}
+
+model DSAProblem {
+  id         String    @id @default(cuid())
+  userId     String
+  title      String
+  difficulty String
+  topic      String
+  platform   String    @default("leetcode")
+  status     String    @default("todo")
+  solvedAt   DateTime?
+  notes      String?
+  isDeleted  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([isDeleted])
+  @@map("dsa_problems")
+}
+
+model PlatformProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  leetcodeHandle   String?
+  codeforcesHandle String?
+  githubUsername   String?
+  linkedinUrl      String?
+  ratings          String   @default("{}")
+  isDeleted        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("platform_profiles")
+}
+
+model StudySession {
+  id              String    @id @default(cuid())
+  userId          String
+  moduleId        String
+  durationMinutes Int       @default(0)
+  focusScore      Float     @default(0)
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+  metadata        String    @default("{}")
+  isDeleted       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([moduleId])
+  @@index([startedAt])
+  @@map("study_sessions")
+}
+
+model CareerGoal {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  targetDate  DateTime?
+  status      String    @default("active")
+  priority    Int       @default(1)
+  isDeleted   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDeleted])
+  @@map("career_goals")
+}
+
+model ResumeProfile {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  version        Int       @default(1)
+  score          Int       @default(0)
+  sections       String    @default("[]")
+  lastAnalyzedAt DateTime?
+  isDeleted      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("resume_profiles")
+}
+
+model OpportunityItem {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  company     String
+  type        String
+  matchScore  Int      @default(0)
+  url         String?
+  discoveredAt DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDeleted])
+  @@map("opportunity_items")
+}
+
+model RoadmapProgress {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  nodes     String   @default("[]")
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("roadmap_progress")
+}

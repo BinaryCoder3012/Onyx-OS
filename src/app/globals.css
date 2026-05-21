@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --carbon: #0a0a0b;
+    --carbon-deep: #050506;
+    --graphite: #161618;
+    --graphite-matte: #1c1c1f;
+    --graphite-border: #2a2a2e;
+    --cyber-yellow: #f5e642;
+    --neon-cyan: #00e5ff;
+    --fg: #e4e4e7;
+    --fg-muted: #71717a;
+    --sidebar-width: 52px;
+    --topbar-height: 40px;
+  }
+
+  * {
+    @apply border-graphite-border;
+  }
+
+  html {
+    @apply antialiased;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-carbon text-onyx-fg font-sans text-sm;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    @apply bg-neon-cyan/20 text-onyx-fg;
+  }
+}
+
+@layer components {
+  .onyx-border {
+    @apply border border-graphite-border;
+  }
+
+  .onyx-surface {
+    @apply bg-graphite-matte;
+  }
+
+  .onyx-panel {
+    @apply bg-graphite border border-graphite-border;
+  }
+
+  .onyx-accent-line {
+    @apply border-l-2 border-neon-cyan;
+  }
+
+  .onyx-active-glow {
+    box-shadow: inset 2px 0 0 0 var(--neon-cyan);
+  }
+
+  .onyx-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .onyx-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--graphite-border) transparent;
+  }
+
+  .onyx-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .onyx-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .onyx-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--graphite-border);
+    border-radius: 0;
+  }
+
+  .onyx-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+  }
+
+  .onyx-kbd {
+    @apply inline-flex items-center justify-center px-1.5 py-0.5 text-2xs font-mono uppercase tracking-wider bg-carbon-elevated border border-graphite-border text-onyx-muted rounded-sm;
+  }
+
+  .onyx-nav-item {
+    @apply flex items-center justify-center w-full h-10 text-onyx-muted transition-colors duration-75 hover:text-onyx-fg hover:bg-carbon-elevated;
+  }
+
+  .onyx-nav-item-active {
+    @apply text-neon-cyan onyx-active-glow bg-carbon-elevated;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
