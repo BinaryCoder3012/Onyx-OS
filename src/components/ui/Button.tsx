@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
-type ButtonVariant = "ghost" | "outline" | "accent";
+type ButtonVariant = "ghost" | "outline" | "accent" | "cyber";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -13,6 +13,8 @@ const variants: Record<ButtonVariant, string> = {
     "bg-graphite border border-graphite-border text-onyx-muted hover:text-onyx-fg hover:border-graphite-muted",
   accent:
     "bg-carbon-elevated border border-neon-cyan/40 text-neon-cyan hover:border-neon-cyan",
+  cyber:
+    "bg-carbon-elevated border border-cyber-yellow/40 text-cyber-yellow hover:border-cyber-yellow",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
