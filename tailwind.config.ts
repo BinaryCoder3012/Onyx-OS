@@ -54,11 +54,31 @@ const config: Config = {
       },
       animation: {
         "pulse-neon": "pulse-neon 2s ease-in-out infinite",
+        "shimmer": "shimmer 2s infinite linear",
+        "fade-in": "fade-in 0.3s ease-out forwards",
+        "slide-in-up": "slide-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "glow-pulse": "glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
         "pulse-neon": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.6" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "slide-in-up": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 5px rgba(0, 240, 255, 0.1), inset 0 0 5px rgba(0, 240, 255, 0.05)" },
+          "50%": { boxShadow: "0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1)" },
         },
       },
     },

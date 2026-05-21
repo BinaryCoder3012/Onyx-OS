@@ -20,7 +20,7 @@ export function Topbar({ className }: TopbarProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-topbar items-center justify-between border-b border-white/5 bg-graphite/40 backdrop-blur-xl px-4 shadow-sm",
+        "sticky top-0 z-30 flex h-topbar items-center justify-between border-b border-graphite-border/40 bg-carbon/70 backdrop-blur-xl px-6 shadow-[0_2px_15px_rgba(0,0,0,0.1)]",
         className
       )}
     >
@@ -29,24 +29,25 @@ export function Topbar({ className }: TopbarProps) {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="flex items-center justify-center text-onyx-muted transition-colors hover:text-onyx-fg lg:hidden"
+          className="flex items-center justify-center text-onyx-muted transition-colors hover:text-white lg:hidden"
           aria-label="Toggle navigation"
         >
           <span className="text-sm">☰</span>
         </button>
-
+ 
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-wider text-onyx-muted"
+          className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em] text-onyx-muted"
         >
           {breadcrumb.map((segment, index) => (
             <span key={`${segment}-${index}`} className="flex items-center gap-1.5">
               {index > 0 && <span className="text-graphite-muted">/</span>}
               <span
                 className={cn(
+                  "transition-colors duration-200",
                   index === breadcrumb.length - 1
-                    ? "text-onyx-fg"
-                    : "text-onyx-muted"
+                    ? "text-neon-cyan font-bold"
+                    : "text-onyx-muted hover:text-onyx-fg cursor-default"
                 )}
               >
                 {segment}
@@ -55,23 +56,25 @@ export function Topbar({ className }: TopbarProps) {
           ))}
         </nav>
       </div>
-
-      <div className="flex items-center gap-3">
+ 
+      <div className="flex items-center gap-4">
         <button
           type="button"
           onClick={open}
-          className="hidden items-center gap-2 border border-graphite-border bg-graphite px-2.5 py-1 font-mono text-2xs text-onyx-muted transition-colors hover:border-graphite-muted hover:text-onyx-fg sm:flex"
+          className="hidden items-center gap-2 border border-graphite-border/80 bg-graphite-matte/40 px-3 py-1 font-mono text-[10px] text-onyx-muted transition-all duration-300 hover:border-neon-cyan/40 hover:text-neon-cyan hover:shadow-[0_0_10px_rgba(0,240,255,0.05)] rounded-sm sm:flex group"
           aria-label="Open command palette"
         >
-          <span>{getModKeyLabel()}</span>
-          <span className="onyx-kbd">K</span>
+          <span className="group-hover:text-white transition-colors">{getModKeyLabel()}</span>
+          <span className="onyx-kbd border-graphite-border group-hover:border-neon-cyan/30 group-hover:text-neon-cyan transition-colors">K</span>
         </button>
-
-        <div className="h-4 w-px bg-graphite-border" />
-
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 border border-graphite-border bg-graphite-matte" />
-          <span className="hidden font-mono text-2xs text-onyx-muted sm:inline">
+ 
+        <div className="h-4 w-px bg-graphite-border/60" />
+ 
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-sm border border-neon-cyan/30 bg-neon-cyan/5 font-mono text-[10px] font-bold text-neon-cyan shadow-[0_0_8px_rgba(0,240,255,0.1)] uppercase">
+            {displayName.substring(0, 2)}
+          </div>
+          <span className="hidden font-mono text-[10px] tracking-wider text-onyx-muted hover:text-white transition-colors duration-300 sm:inline uppercase">
             {displayName}
           </span>
         </div>

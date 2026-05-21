@@ -48,7 +48,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-px overflow-y-auto overflow-x-hidden py-2 onyx-scrollbar">
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden py-4 onyx-scrollbar px-2">
         {NAV_ITEMS.map((item) => {
           const isActive = activeModule === item.id;
           return (
@@ -57,21 +57,27 @@ export function Sidebar() {
               href={item.href}
               title={item.label}
               className={cn(
-                "group relative flex items-center gap-3 px-3 py-2.5 font-mono text-2xs text-onyx-muted transition-colors duration-75",
-                "hover:bg-carbon-elevated hover:text-onyx-fg",
-                isActive && "bg-carbon-elevated text-neon-cyan",
+                "group relative flex items-center gap-3 px-3 py-2.5 font-mono text-[10px] text-onyx-muted transition-all duration-300 rounded-sm select-none",
+                "hover:bg-carbon-elevated/80 hover:text-white",
+                isActive && "bg-gradient-to-r from-neon-cyan/10 to-neon-cyan/[0.01] text-neon-cyan border border-neon-cyan/20 shadow-[0_0_15px_rgba(0,240,255,0.03)]",
+                !isActive && "border border-transparent",
                 collapsed && "justify-center px-0"
               )}
               aria-current={isActive ? "page" : undefined}
             >
-              <span className="shrink-0 text-sm leading-none">{item.icon}</span>
+              <span className={cn(
+                "shrink-0 text-sm leading-none transition-transform duration-300 group-hover:scale-110",
+                isActive ? "text-neon-cyan" : "text-onyx-muted group-hover:text-white"
+              )}>
+                {item.icon}
+              </span>
               {!collapsed && (
-                <span className="truncate uppercase tracking-wider">
+                <span className="truncate uppercase tracking-widest font-medium transition-transform duration-300 group-hover:translate-x-0.5">
                   {item.label}
                 </span>
               )}
-              {isActive && (
-                <span className="absolute right-0 top-1/2 h-4 w-px -translate-y-1/2 bg-neon-cyan" />
+              {isActive && !collapsed && (
+                <span className="absolute right-2 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-neon-cyan shadow-[0_0_8px_#00f0ff]" />
               )}
             </Link>
           );
