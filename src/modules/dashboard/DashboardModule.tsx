@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ModuleHeader } from "@/components/shared/ModuleHeader";
 import { BarChart, LoadingState, Panel, StatCard } from "@/components/ui";
 import { MODULE_LABELS } from "@/constants/navigation";
 import { apiFetch } from "@/lib/api";

@@ -43,6 +43,9 @@ export function OnboardingModal() {
   const [targetRole, setTargetRole] = useState(CAREER_OPTIONS[0]);
   const [resumeText, setResumeText] = useState("");
   const [dismissed, setDismissed] = useState(false);
+  const [useFileUpload, setUseFileUpload] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -61,10 +64,10 @@ export function OnboardingModal() {
   });
 
   const parseMutation = useMutation({
-    mutationFn: () => 
+    mutationFn: (body: FormData) => 
       apiFetch("/api/resume/parse", { 
         method: "POST", 
-        body: JSON.stringify({ targetRole, resumeText }) 
+        body
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["resume"] });
@@ -96,9 +99,23 @@ export function OnboardingModal() {
     if (targetRole) {
       localStorage.setItem("onyx_target_role", targetRole);
     }
-    if (resumeText.trim().length > 10) {
-      await parseMutation.mutateAsync();
+    
+    const formData = new FormData();
+    formData.append("targetRole", targetRole || "");
+
+    let hasResume = false;
+    if (useFileUpload && selectedFile) {
+      formData.append("file", selectedFile);
+      hasResume = true;
+    } else if (!useFileUpload && resumeText.trim().length >= 10) {
+      formData.append("resumeText", resumeText);
+      hasResume = true;
     }
+
+    if (hasResume) {
+      await parseMutation.mutateAsync(formData);
+    }
+    
     setStep("done");
     setTimeout(() => setDismissed(true), 1800);
   };
@@ -219,19 +236,100 @@ export function OnboardingModal() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <p className="font-mono text-2xs text-onyx-muted">
-                  Paste your resume plain text below. Our AI will instantly extract your skills, score your sections, and create your initial roadmap goals.
+                  Provide your resume to analyze your skills and auto-create milestones.
                 </p>
-                <div className="space-y-1">
-                  <label className="font-mono text-2xs text-onyx-subtle">Resume Content (Optional)</label>
-                  <textarea
-                    className="h-32 w-full resize-none border border-graphite-border bg-carbon p-3 font-mono text-2xs text-onyx-fg outline-none focus:border-neon-cyan/50 onyx-scrollbar"
-                    placeholder="Paste the text of your resume here..."
-                    value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
-                  />
+
+                {/* Sub-tabs for file vs text */}
+                <div className="flex border-b border-graphite-border/30">
+                  <button
+                    type="button"
+                    className={cn(
+                      "px-3 py-1.5 font-mono text-[10px] border-b-2 transition-all",
+                      useFileUpload
+                        ? "border-neon-cyan text-neon-cyan"
+                        : "border-transparent text-onyx-muted hover:text-onyx-fg"
+                    )}
+                    onClick={() => setUseFileUpload(true)}
+                  >
+                    File Upload (.pdf, .docx)
+                  </button>
+                  <button
+                    type="button"
+                    className={cn(
+                      "px-3 py-1.5 font-mono text-[10px] border-b-2 transition-all",
+                      !useFileUpload
+                        ? "border-neon-cyan text-neon-cyan"
+                        : "border-transparent text-onyx-muted hover:text-onyx-fg"
+                    )}
+                    onClick={() => setUseFileUpload(false)}
+                  >
+                    Paste Plain Text
+                  </button>
                 </div>
+
+                {useFileUpload ? (
+                  <div
+                    onDragEnter={(e) => { e.preventDefault(); setDragActive(true); }}
+                    onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                    onDragLeave={() => setDragActive(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragActive(false);
+                      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        setSelectedFile(e.dataTransfer.files[0]);
+                      }
+                    }}
+                    onClick={() => {
+                      const input = document.createElement("input");
+                      input.type = "file";
+                      input.accept = ".pdf,.docx,.txt";
+                      input.onchange = (e) => {
+                        const files = (e.target as HTMLInputElement).files;
+                        if (files && files[0]) setSelectedFile(files[0]);
+                      };
+                      input.click();
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center border border-dashed rounded p-6 text-center cursor-pointer transition-all",
+                      dragActive
+                        ? "border-neon-cyan bg-neon-cyan/5"
+                        : "border-graphite-border/65 hover:border-neon-cyan/40 bg-carbon/20"
+                    )}
+                  >
+                    {selectedFile ? (
+                      <div className="space-y-1">
+                        <p className="font-mono text-2xs font-bold text-neon-cyan truncate max-w-[240px]">
+                          {selectedFile.name}
+                        </p>
+                        <p className="font-mono text-[10px] text-onyx-muted">
+                          {(selectedFile.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <span className="text-xl">⇪</span>
+                        <p className="font-mono text-2xs text-onyx-fg">
+                          Click or drag resume file here
+                        </p>
+                        <p className="font-mono text-[10px] text-onyx-muted">
+                          PDF, DOCX, or TXT
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <label className="font-mono text-3xs text-onyx-subtle">Resume Content</label>
+                    <textarea
+                      className="h-28 w-full resize-none border border-graphite-border bg-carbon p-2 font-mono text-2xs text-onyx-fg outline-none focus:border-neon-cyan/50 onyx-scrollbar"
+                      placeholder="Paste your plain text resume contents here..."
+                      value={resumeText}
+                      onChange={(e) => setResumeText(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between pt-2">
