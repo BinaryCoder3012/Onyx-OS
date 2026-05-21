@@ -16,7 +16,19 @@ interface ProfilePayload {
   } | null;
 }
 
-type Step = "platform" | "target" | "done";
+type Step = "platform" | "resume" | "done";
+
+const CAREER_OPTIONS = [
+  "Frontend Engineer",
+  "Backend Engineer",
+  "Fullstack Engineer",
+  "Machine Learning Engineer",
+  "Data Scientist",
+  "DevOps / SRE",
+  "Product Manager",
+  "Mobile Developer (iOS/Android)",
+  "Security Engineer"
+];
 
 export function OnboardingModal() {
   const qc = useQueryClient();
@@ -24,7 +36,8 @@ export function OnboardingModal() {
   const [lc, setLc] = useState("");
   const [cf, setCf] = useState("");
   const [gh, setGh] = useState("");
-  const [targetRole, setTargetRole] = useState("");
+  const [targetRole, setTargetRole] = useState(CAREER_OPTIONS[0]);
+  const [resumeText, setResumeText] = useState("");
   const [dismissed, setDismissed] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -43,6 +56,18 @@ export function OnboardingModal() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
   });
 
+  const parseMutation = useMutation({
+    mutationFn: () => 
+      apiFetch("/api/resume/parse", { 
+        method: "POST", 
+        body: JSON.stringify({ targetRole, resumeText }) 
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["resume"] });
+      qc.invalidateQueries({ queryKey: ["career"] });
+    }
+  });
+
   // Don't show if loading, dismissed, or already configured
   if (isLoading || dismissed) return null;
   const p = data?.profile;
@@ -50,7 +75,7 @@ export function OnboardingModal() {
   if (isConfigured) return null;
 
   const handleSaveHandles = async () => {
-    if (!lc && !cf && !gh) { setStep("target"); return; }
+    if (!lc && !cf && !gh) { setStep("resume"); return; }
     await saveMutation.mutateAsync({
       leetcodeHandle: lc || null,
       codeforcesHandle: cf || null,
@@ -58,13 +83,15 @@ export function OnboardingModal() {
     });
     // Auto-sync ratings after saving handles
     if (lc || cf) await syncMutation.mutateAsync();
-    setStep("target");
+    setStep("resume");
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (targetRole) {
-      // Store target in localStorage for resume module to pick up
       localStorage.setItem("onyx_target_role", targetRole);
+    }
+    if (resumeText.trim().length > 10) {
+      await parseMutation.mutateAsync();
     }
     setStep("done");
     setTimeout(() => setDismissed(true), 1800);
@@ -72,7 +99,7 @@ export function OnboardingModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-carbon-deep/90 backdrop-blur-sm">
-      <div className="w-full max-w-md border border-graphite-border bg-graphite shadow-onyx">
+      <div className="w-full max-w-lg border border-graphite-border bg-graphite shadow-onyx">
         {/* Header */}
         <div className="border-b border-graphite-border px-6 py-4">
           <div className="flex items-center gap-3">
@@ -83,7 +110,7 @@ export function OnboardingModal() {
               </h2>
               <p className="font-mono text-2xs text-onyx-muted">
                 {step === "platform" && "Step 1 of 2 — Platform handles"}
-                {step === "target" && "Step 2 of 2 — Your target"}
+                {step === "resume" && "Step 2 of 2 — Career & Context"}
                 {step === "done" && "All set"}
               </p>
             </div>
@@ -98,7 +125,7 @@ export function OnboardingModal() {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 max-h-[70vh] overflow-y-auto onyx-scrollbar">
           {step === "platform" && (
             <div className="space-y-4">
               <p className="font-mono text-2xs text-onyx-muted">
@@ -131,14 +158,10 @@ export function OnboardingModal() {
                   />
                 </div>
               </div>
-              {/* Privacy assurance */}
-              <p className="font-mono text-[10px] text-graphite-muted">
-                🛡️ We only read your public profile data. No login credentials required.
-              </p>
               <div className="flex items-center justify-between pt-1">
                 <button
                   type="button"
-                  onClick={() => { setStep("target"); }}
+                  onClick={() => { setStep("resume"); }}
                   className="font-mono text-2xs text-graphite-muted underline underline-offset-2 hover:text-onyx-muted"
                 >
                   Skip for now
@@ -154,21 +177,42 @@ export function OnboardingModal() {
             </div>
           )}
 
-          {step === "target" && (
-            <div className="space-y-4">
-              <p className="font-mono text-2xs text-onyx-muted">
-                What role are you targeting? This helps Onyx AI tailor your resume analysis and opportunity matching.
-              </p>
-              <div className="space-y-1">
-                <label className="font-mono text-2xs text-onyx-subtle">Target Role</label>
-                <Input
-                  placeholder="e.g. SWE Intern at FAANG, Backend Engineer, ML Engineer"
-                  value={targetRole}
-                  onChange={(e) => setTargetRole(e.target.value)}
-                  autoFocus
-                />
+          {step === "resume" && (
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <p className="font-mono text-2xs text-onyx-muted">
+                  What role are you targeting? This configures Onyx AI for tailored insights.
+                </p>
+                <div className="space-y-1">
+                  <label className="font-mono text-2xs text-onyx-subtle">Target Role</label>
+                  <select 
+                    className="w-full border border-graphite-border bg-carbon px-3 py-2 font-mono text-xs text-onyx-fg outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all"
+                    value={targetRole}
+                    onChange={(e) => setTargetRole(e.target.value)}
+                  >
+                    {CAREER_OPTIONS.map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="flex items-center justify-between pt-1">
+
+              <div className="space-y-2">
+                <p className="font-mono text-2xs text-onyx-muted">
+                  Paste your resume plain text below. Our AI will instantly extract your skills, score your sections, and create your initial roadmap goals.
+                </p>
+                <div className="space-y-1">
+                  <label className="font-mono text-2xs text-onyx-subtle">Resume Content (Optional)</label>
+                  <textarea
+                    className="h-32 w-full resize-none border border-graphite-border bg-carbon p-3 font-mono text-2xs text-onyx-fg outline-none focus:border-neon-cyan/50 onyx-scrollbar"
+                    placeholder="Paste the text of your resume here..."
+                    value={resumeText}
+                    onChange={(e) => setResumeText(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
                   onClick={() => setStep("platform")}
@@ -176,8 +220,8 @@ export function OnboardingModal() {
                 >
                   ← Back
                 </button>
-                <Button variant="accent" onClick={handleFinish}>
-                  {targetRole ? "Finish Setup" : "Skip & Finish"}
+                <Button variant="accent" onClick={handleFinish} disabled={parseMutation.isPending}>
+                  {parseMutation.isPending ? "Scanning AI..." : "Initialize Profile"}
                 </Button>
               </div>
             </div>
@@ -186,7 +230,7 @@ export function OnboardingModal() {
           {step === "done" && (
             <div className="flex flex-col items-center gap-3 py-4">
               <span className="text-3xl text-neon-cyan">✓</span>
-              <p className="font-mono text-xs text-onyx-fg">Setup complete. Onyx OS is ready.</p>
+              <p className="font-mono text-xs text-onyx-fg">Initialization complete.</p>
               <p className="font-mono text-2xs text-onyx-muted">
                 {targetRole && `Targeting: ${targetRole}`}
               </p>
@@ -197,7 +241,7 @@ export function OnboardingModal() {
         {/* Footer — privacy note */}
         <div className={cn("border-t border-graphite-border px-6 py-3", step === "done" && "hidden")}>
           <p className="font-mono text-[10px] text-graphite-muted">
-            🔒 Your data stays private. We never train AI on your content or share with third parties.
+            🔒 Your data stays private. We never train public AI on your content.
           </p>
         </div>
       </div>
