@@ -11,6 +11,7 @@ import { OnboardingModal } from "../shared/OnboardingModal";
 import { BreadcrumbSync } from "./BreadcrumbSync";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
+import { AssistantWidget } from "../assistant/AssistantWidget";
 
 interface AppShellProps {
   children: ReactNode;
@@ -28,6 +29,7 @@ export function AppShell({ children }: AppShellProps) {
     <div className="min-h-screen bg-carbon">
       <OnboardingModal />
       <BreadcrumbSync />
+      <AssistantWidget />
       <Sidebar />
       <div
         className={cn(
