@@ -54,6 +54,8 @@ export interface PlatformProfile {
   userId: string;
   leetcodeHandle: string | null;
   codeforcesHandle: string | null;
+  codechefHandle: string | null;
+  atcoderHandle: string | null;
   githubUsername: string | null;
   linkedinUrl: string | null;
   ratings: PlatformRatings;
@@ -65,6 +67,7 @@ export interface PlatformProfile {
 export interface PlatformRatings {
   leetcode: number | null;
   codeforces: number | null;
+  codechef: number | null;
   atcoder: number | null;
 }
 
