@@ -48,11 +48,31 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
 
   if (isError) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-carbon p-8">
-        <p className="font-mono text-sm text-onyx-fg">Failed to initialize session.</p>
-        <p className="mt-2 font-mono text-2xs text-onyx-muted">
-          Run: npm run db:push &amp;&amp; npm run db:seed
-        </p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-carbon-deep p-8">
+        <div className="w-full max-w-lg border border-red-500/20 bg-graphite/80 p-8 shadow-onyx backdrop-blur-md rounded-xl">
+          <div className="mb-4 flex items-center justify-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-xl text-red-500">
+              ⚠️
+            </span>
+          </div>
+          <h1 className="mb-2 text-center font-mono text-lg font-bold text-onyx-fg">
+            Database Connection Failed
+          </h1>
+          <p className="mb-6 text-center font-mono text-xs text-onyx-muted">
+            Onyx OS requires a valid PostgreSQL database to store your session and progress.
+          </p>
+          <div className="space-y-4 rounded-lg bg-carbon p-4 font-mono text-2xs text-graphite-muted">
+            <p>
+              <strong className="text-neon-cyan">Step 1:</strong> Provision a free PostgreSQL database (e.g., Supabase, Neon).
+            </p>
+            <p>
+              <strong className="text-neon-cyan">Step 2:</strong> Add your connection string to your Vercel Environment Variables as <code className="bg-graphite px-1 py-0.5 text-onyx-fg">DATABASE_URL</code>.
+            </p>
+            <p>
+              <strong className="text-neon-cyan">Step 3:</strong> Trigger a new deployment on Vercel to apply the changes.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
