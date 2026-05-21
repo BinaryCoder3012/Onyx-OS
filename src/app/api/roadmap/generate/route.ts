@@ -68,7 +68,10 @@ ${context}`,
     // Lock all parents except the first one
     if (nodes.length > 0) {
       for (let i = 1; i < nodes.length; i++) {
-        nodes[i].status = "locked";
+        const node = nodes[i];
+        if (node) {
+          node.status = "locked";
+        }
       }
     }
 
