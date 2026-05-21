@@ -159,7 +159,7 @@ export function createAnthropicAdapter(apiKey: string): ProviderAdapter {
 export function createStubAdapter(name: AIProvider): ProviderAdapter {
   return {
     name,
-    async complete(system, user, _model) {
+    async complete(system, user) {
       let raw = "{}";
       const promptLower = (system + "\n" + user).toLowerCase();
       
