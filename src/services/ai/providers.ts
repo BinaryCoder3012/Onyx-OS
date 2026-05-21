@@ -15,7 +15,7 @@ export interface ProviderAdapter {
 
 // ── Gemini ────────────────────────────────────────────────────────────
 
-const GEMINI_DEFAULT_MODEL = "gemini-1.5-flash-native-audio-latest";
+const GEMINI_DEFAULT_MODEL = "gemini-2.5-flash-native-audio-latest";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 export function createGeminiAdapter(apiKey: string): ProviderAdapter {

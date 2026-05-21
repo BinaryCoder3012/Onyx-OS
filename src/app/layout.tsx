@@ -1,4 +1,5 @@
 import { AuthBootstrap } from "@/components/auth/AuthBootstrap";
+import { NavBar } from "@/components/shared/NavBar";
 import { AppShell } from "@/components/layout";
 import { CommandPaletteHost } from "@/components/command/CommandPaletteHost";
 import { AppProviders } from "@/providers";
@@ -20,8 +21,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-carbon antialiased">
         <AppProviders>
           <AuthBootstrap>
+            <NavBar />
             <AppShell>{children}</AppShell>
-            <CommandPaletteHost />
+            <Footer />
           </AuthBootstrap>
         </AppProviders>
       </body>

@@ -1,0 +1,10 @@
+{
+  "softwareEngineer": [
+    { "title": "Full-Stack Developer", "description": "Build end-to-end web applications using React and Node.js." },
+    { "title": "Backend Engineer", "description": "Design RESTful APIs and microservices with TypeScript and Express." }
+  ],
+  "dataScientist": [
+    { "title": "Machine Learning Engineer", "description": "Develop ML models and pipelines using Python and TensorFlow." },
+    { "title": "Data Analyst", "description": "Perform data wrangling and visualization with SQL and PowerBI." }
+  ]
+}

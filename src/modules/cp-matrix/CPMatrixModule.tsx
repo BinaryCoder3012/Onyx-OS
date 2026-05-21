@@ -28,11 +28,30 @@ export function CPMatrixModule() {
   const [ac, setAc] = useState<string | null>(null);
   const [gh, setGh] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => apiFetch<ProfilePayload>("/api/profile"),
   });
 
+  const { data: links, isLoading: linksLoading } = useQuery({
+    queryKey: [
+      "cp-handles",
+      profileData?.profile?.leetcodeHandle,
+      profileData?.profile?.codeforcesHandle,
+      profileData?.profile?.codechefHandle,
+      profileData?.profile?.atcoderHandle,
+    ],
+    queryFn: async () => {
+      const { leetcodeHandle, codeforcesHandle, codechefHandle, atcoderHandle } = profileData?.profile ?? {};
+      const params = new URLSearchParams();
+      if (leetcodeHandle) params.append("leetcode", leetcodeHandle);
+      if (codeforcesHandle) params.append("codeforces", codeforcesHandle);
+      if (codechefHandle) params.append("codechef", codechefHandle);
+      if (atcoderHandle) params.append("atcoder", atcoderHandle);
+      return apiFetch<any>(`/api/cp/handles?${params.toString()}`);
+    },
+    enabled: !!profileData?.profile,
+  });
   const saveMutation = useMutation({
     mutationFn: (body: Record<string, unknown>) =>
       apiFetch("/api/profile", { method: "PATCH", body: JSON.stringify(body) }),
@@ -44,9 +63,9 @@ export function CPMatrixModule() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
   });
 
-  if (isLoading || !data?.profile) return <LoadingState label="Loading CP Matrix" />;
+  if (profileLoading || linksLoading || !profileData?.profile) return <LoadingState label="Loading CP Matrix" />;
 
-  const p = data.profile;
+  const p = profileData.profile;
   const r = p.ratings;
 
   // Platform tier helpers
@@ -94,7 +113,7 @@ export function CPMatrixModule() {
       handle: p.leetcodeHandle,
       rating: r.leetcode,
       tier: getLeetCodeTier(r.leetcode),
-      url: p.leetcodeHandle ? `https://leetcode.com/u/${p.leetcodeHandle}` : null,
+      url: links?.leetcode ?? null,
     },
     {
       id: "codeforces",
@@ -102,7 +121,7 @@ export function CPMatrixModule() {
       handle: p.codeforcesHandle,
       rating: r.codeforces,
       tier: getCodeforcesTier(r.codeforces),
-      url: p.codeforcesHandle ? `https://codeforces.com/profile/${p.codeforcesHandle}` : null,
+      url: links?.codeforces ?? null,
     },
     {
       id: "codechef",
@@ -110,7 +129,7 @@ export function CPMatrixModule() {
       handle: p.codechefHandle,
       rating: r.codechef,
       tier: getCodeChefTier(r.codechef),
-      url: p.codechefHandle ? `https://www.codechef.com/users/${p.codechefHandle}` : null,
+      url: links?.codechef ?? null,
     },
     {
       id: "atcoder",
@@ -118,7 +137,7 @@ export function CPMatrixModule() {
       handle: p.atcoderHandle,
       rating: r.atcoder,
       tier: getAtCoderTier(r.atcoder),
-      url: p.atcoderHandle ? `https://atcoder.jp/users/${p.atcoderHandle}` : null,
+      url: links?.atcoder ?? null,
     },
   ];
 
