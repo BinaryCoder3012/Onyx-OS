@@ -25,21 +25,30 @@ export const POST = createApiHandler({
 
     // Schema for the AI response
     const aiSchema = z.object({
-      roadmap: z.array(z.object({
-        title: z.string(),
-        description: z.string(),
-        children: z.array(z.object({
+      roadmap: z.array(
+        z.object({
           title: z.string(),
-          description: z.string()
-        }))
-      }))
+          description: z.string(),
+          duration: z.string(),
+          children: z.array(
+            z.object({
+              title: z.string(),
+              description: z.string(),
+              duration: z.string(),
+              resources: z.array(z.string()).optional(),
+            })
+          ),
+        })
+      ),
     });
 
     const context = `Target Role: ${body.targetRole || "Software Engineer"}\n\nCareer Goals:\n${goals.map(g => g.title).join(", ")}\n\nResume Context:\n${resume ? resume.sections : "No resume provided"}`;
 
     const prompt = buildPrompt(
-      SYSTEM_PROMPTS.resume, // General AI persona
-      `Create a detailed, step-by-step learning roadmap for the following user profile. Structure it into major phases (parents) and specific topics/projects (children).
+      SYSTEM_PROMPTS.roadmap,
+      `Create a detailed, step-by-step learning roadmap for the user targeting the role of "${body.targetRole || "Software Engineer"}". 
+Structure it into 3-4 major chronological phases (parents) with estimated durations (e.g., "Weeks 1-4", "Weeks 5-12").
+Under each phase, generate 3-5 specific actionable milestones (children) with a description, duration (e.g., "Week 1", "Week 2"), and 2-3 high-quality learning resource links/names.
 
 Context:
 ${context}`,
@@ -56,10 +65,15 @@ ${context}`,
     const nodes: RoadmapNode[] = aiResponse.data.roadmap.map(phase => ({
       id: crypto.randomUUID(),
       title: phase.title,
+      description: phase.description,
+      duration: phase.duration,
       status: "active",
       children: phase.children.map(child => ({
         id: crypto.randomUUID(),
         title: child.title,
+        description: child.description,
+        duration: child.duration,
+        resources: child.resources || [],
         status: "locked",
         children: []
       }))

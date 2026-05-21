@@ -198,6 +198,9 @@ export interface RoadmapNode {
   id: string;
   title: string;
   status: "locked" | "active" | "complete";
+  description?: string;
+  duration?: string;
+  resources?: string[];
   children: RoadmapNode[];
 }
 
