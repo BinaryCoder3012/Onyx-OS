@@ -39,7 +39,7 @@ export function DashboardModule() {
     queryFn: () => apiFetch<DashboardStats>("/api/dashboard"),
   });
 
-  const { data: suggestion, isLoading: isLoadingSuggestion } = useQuery({
+  const { data: suggestion } = useQuery({
     queryKey: ["suggestion"],
     queryFn: () => apiFetch<Suggestion>("/api/dashboard/suggestion"),
   });
