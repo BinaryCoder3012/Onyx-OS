@@ -20,7 +20,7 @@ export function Topbar({ className }: TopbarProps) {
   return (
     <header
       className={cn(
-        "flex h-topbar items-center justify-between border-b border-graphite-border bg-carbon-elevated px-4",
+        "sticky top-0 z-30 flex h-topbar items-center justify-between border-b border-white/5 bg-graphite/40 backdrop-blur-xl px-4 shadow-sm",
         className
       )}
     >
