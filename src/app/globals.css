@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/*
+  Onyx palette — taken from the stone itself.
+  Onyx is black chalcedony crossed by milky bands; sardonyx adds a red-orange layer (sard).
+  Colour lives on data and on the one live thing, never on chrome.
+*/
+@theme {
+  --color-onyx: #100f0e;
+  --color-slab: #171513;
+  --color-shelf: #1f1c19;
+  --color-seam: #2c2824;
+  --color-seam-strong: #3b3631;
+  --color-chalk: #ede8e0;
+  --color-chalk-2: #b0a89d;
+  --color-chalk-3: #7a736a;
+  --color-sard: #e0703f;
+  --color-sard-deep: #9c4524;
+  --color-agate: #86a9bd;
+  --color-good: #8cbf88;
+  --color-warn: #e2b65d;
+  --color-bad: #e2665a;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, monospace;
+
+  --ease-stone: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-onyx);
+  color: var(--color-chalk);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--color-onyx);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: var(--color-sard);
+  color: var(--color-onyx);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sard);
+  outline-offset: 2px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thin, quiet scrollbars inside the workspace panes */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-seam-strong) transparent;
+}
+
+/* Prose returned by the assistant */
+.answer p { margin: 0 0 0.7em; }
+.answer p:last-child { margin-bottom: 0; }
+.answer ul, .answer ol { margin: 0 0 0.7em; padding-left: 1.2em; }
+.answer ul { list-style: disc; }
+.answer ol { list-style: decimal; }
+.answer li { margin: 0.2em 0; }
+.answer code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-shelf);
+  border: 1px solid var(--color-seam);
+  border-radius: 4px;
+  padding: 0 0.3em;
+}
+.answer pre {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-onyx);
+  border: 1px solid var(--color-seam);
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+  margin: 0 0 0.7em;
+}
+.answer pre code { background: none; border: 0; padding: 0; }
+.answer strong { color: var(--color-chalk); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
